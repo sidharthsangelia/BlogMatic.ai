@@ -43,7 +43,7 @@ export default async function Dashboard() {
 
   // Fix: Handle undefined return from getPlanType
   const planType = getPlanType(priceId as string);
-  const { id: planTypeId = "starter", name: planTypeName = "Starter" } = planType || {};
+  const { id: planTypeId = "starter", name: planTypeName = "Starter" } = planType ;
 
   const isBasicPlan = planTypeId === "basic";
   const isProPlan = planTypeId === "pro";
