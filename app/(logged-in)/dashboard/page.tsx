@@ -23,7 +23,7 @@ export default async function Dashboard() {
 
   const email = clerkUser?.emailAddresses?.[0].emailAddress ?? "";
 
-  //updatethe user id
+  //update the user id
   let userId = null;
   let priceId = null;
 
@@ -40,9 +40,9 @@ export default async function Dashboard() {
     priceId = user[0].priceId;
   }
 
-  const { id: planTypeId = "starter", name: planTypeName } = getPlanType(
-    priceId as string
-  );
+  // Fix: Handle undefined return from getPlanType
+  const planType = getPlanType(priceId as string);
+  const { id: planTypeId = "starter", name: planTypeName = "Starter" } = planType || {};
 
   const isBasicPlan = planTypeId === "basic";
   const isProPlan = planTypeId === "pro";
@@ -55,6 +55,7 @@ export default async function Dashboard() {
   });
 
   const isValidBasicPlan = isBasicPlan && posts.length < 3;
+  
   return (
     <BgGradient>
       <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
