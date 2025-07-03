@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans} from "next/font/google";
+import { IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import Header from "@/components/Home/Header";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const fontSans = IBM_Plex_Sans({
-  weight: [ "300", "400", "500", "700" ],
+  weight: ["300", "400", "500", "700"],
   subsets: ["latin"],
   variable: "--font-sans",
 });
-
- 
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -23,17 +22,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <ClerkProvider>
+      <html lang="en">
       <body
-        className={cn("min-h-screen bg-background font-sans  antialiased", fontSans.variable)}
+        className={cn(
+          "min-h-screen bg-background font-sans  antialiased",
+          fontSans.variable
+        )}
       >
-        <Header/>
-<main className=" ">
-  
-        {children}
-</main>
-        
+        <Header />
+        <main className=" ">{children}</main>
       </body>
     </html>
+    </ClerkProvider>
   );
 }
