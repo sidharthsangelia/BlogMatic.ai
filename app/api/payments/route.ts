@@ -1,3 +1,4 @@
+import { handleCheckOutSessionComplete } from "@/lib/payment-helpers";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
@@ -23,6 +24,8 @@ export async function POST(req: NextRequest) {
         );
         console.log({ session });
         // connect to db and handle session
+
+        await handleCheckOutSessionComplete({session, stripe})
         break;
       }
       case "customer.subscription.deleted": {
@@ -31,6 +34,8 @@ export async function POST(req: NextRequest) {
           subscriptionId
         );
         // update user subscription status
+
+        
         break;
       }
       case "payment_method.attached": {
