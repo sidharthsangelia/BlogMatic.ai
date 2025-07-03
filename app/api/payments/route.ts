@@ -1,4 +1,4 @@
-import { handleCheckOutSessionComplete } from "@/lib/payment-helpers";
+import { handleCheckOutSessionComplete, handleSubscriptionDeleted } from "@/lib/payment-helpers";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
@@ -30,11 +30,9 @@ export async function POST(req: NextRequest) {
       }
       case "customer.subscription.deleted": {
         const subscriptionId = event.data.object.id;
-        const subscription = await stripe.subscriptions.retrieve(
-          subscriptionId
-        );
+ 
         // update user subscription status
-
+await handleSubscriptionDeleted({subscriptionId, stripe })
         
         break;
       }

@@ -1,0 +1,45 @@
+export const plans = [
+  {
+    id: "regular",
+    name: "Regular",
+    description: "Perfect for content creators and bloggers",
+    price: "10",
+    items: [
+      "5 video conversions per month",
+      "Up to 10 minutes per video",
+      "Basic blog formatting",
+      "Email support",
+      "Standard processing speed",
+      "Download as markdown",
+      "Basic SEO optimization"
+    ],
+    paymentLink: "https://buy.stripe.com/test_00waEQclec2q73q2Orbsc00",
+    priceId:
+      process.env.NODE_ENV === "development"
+        ? "price_1RghXN4YIYKhBglKbP1QXuGN"  
+        : "",
+  },
+  {
+    id: "pro",
+    name: "Pro",
+    description: "For professionals and growing businesses",
+    price: "19.99",
+    items: [
+      "25 video conversions per month",
+      "Up to 60 minutes per video",
+      "Advanced blog formatting",
+      "Priority support",
+      "2x faster processing",
+      "Multiple export formats",
+      "Advanced SEO optimization",
+      "Custom templates",
+      "Bulk processing",
+      "API access"
+    ],
+    paymentLink: "https://buy.stripe.com/test_28E14gcleaYm73q3Svbsc01",
+    priceId:
+      process.env.NODE_ENV === "development"
+        ? "price_1RghZs4YIYKhBglKK3lSJHjy"  
+        : "",
+  },
+];

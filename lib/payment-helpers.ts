@@ -1,6 +1,38 @@
 import Stripe from "stripe";
 import { prisma } from "./prisma";
 
+export async function handleSubscriptionDeleted({
+  subscriptionId,
+  stripe,
+}: {
+  subscriptionId: string;
+  stripe: Stripe;
+}) {
+  try {
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+
+    const user = await prisma.user.findFirst({
+      where: {
+        customerId: subscription.customer as string,
+      },
+    });
+
+    if (user) {
+      await prisma.user.update({
+        where: {
+          id: user.id, // Use the unique id field
+        },
+        data: {
+          status: "cancelled",
+        },
+      });
+    }
+  } catch (error) {
+    console.error(`Failed to process subscription deletion for subscription ${subscriptionId}:`, error);
+    throw error;
+  }
+}
+
 export async function handleCheckOutSessionComplete({
   session,
   stripe,
@@ -35,7 +67,7 @@ async function insertPayment(
       },
     });
   } catch (error) {
-    console.error("Error in creating user", error);
+    console.error(`Failed to create payment record for customer ${customerEmail}:`, error);
   }
 }
 
@@ -60,7 +92,7 @@ async function createOrUpdateUser(
       });
     }
   } catch (error) {
-    console.error("Error in creating user", error);
+    console.error(`Failed to create or update user for customer ${customer.email}:`, error);
   }
 }
 
@@ -76,6 +108,6 @@ async function updateUserSubscription(priceId: string, email: string) {
       },
     });
   } catch (error) {
-    console.error("Error in creating user", error);
+    console.error(`Failed to update subscription for user ${email}:`, error);
   }
 }
