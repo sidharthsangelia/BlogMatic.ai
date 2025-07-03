@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Sans} from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import Header from "@/components/Home/Header";
 
 const fontSans = IBM_Plex_Sans({
   weight: [ "300", "400", "500", "700" ],
@@ -26,7 +27,12 @@ export default function RootLayout({
       <body
         className={cn("min-h-screen bg-background font-sans  antialiased", fontSans.variable)}
       >
+        <Header/>
+<main className=" ">
+  
         {children}
+</main>
+        
       </body>
     </html>
   );

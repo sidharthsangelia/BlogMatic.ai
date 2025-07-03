@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import Banner from "@/components/ui/Home/Banner";
+import Banner from "@/components/Home/Banner";
  
 
 export default function Home() {
