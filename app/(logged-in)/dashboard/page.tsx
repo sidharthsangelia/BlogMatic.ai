@@ -1,6 +1,7 @@
 import BgGradient from "@/components/common/bg-gradient";
 import { Badge } from "@/components/ui/badge";
 import UpgradeYourPlan from "@/components/UpgradeYourPlan";
+import UploadForm from "@/components/UploadForm";
 import { plans } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import {
@@ -84,7 +85,9 @@ export default async function Dashboard() {
           )}
 
           {isValidBasicPlan || isProPlan ? (
-            <BgGradient>{/* <UploadForm /> */}</BgGradient>
+            <BgGradient> 
+                <UploadForm />
+                </BgGradient>
           ) : (
             <UpgradeYourPlan />
           )}
