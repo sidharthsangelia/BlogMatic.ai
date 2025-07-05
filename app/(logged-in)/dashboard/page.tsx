@@ -43,17 +43,6 @@ export default async function Dashboard() {
   const planType = getPlanType(priceId as string);
   const { id: planTypeId = "starter", name: planTypeName = "Starter" } = planType || {};
 
-  // Debug logs - remove these in production
-  console.log("=== DASHBOARD DEBUG ===");
-  console.log("Email:", email);
-  console.log("User exists:", !!user);
-  console.log("User ID:", userId);
-  console.log("Price ID:", priceId);
-  console.log("Plan Type:", planType);
-  console.log("Plan Type ID:", planTypeId);
-  console.log("Plan Type Name:", planTypeName);
-  console.log("Has User Cancelled:", hasUserCancelled);
-
   const isBasicPlan = planTypeId === "basic";
   const isProPlan = planTypeId === "pro";
   const isStarterPlan = planTypeId === "starter";
@@ -64,11 +53,6 @@ export default async function Dashboard() {
       userId: userId,
     },
   }) : [];
-
-  console.log("Posts count:", posts.length);
-  console.log("Is Basic Plan:", isBasicPlan);
-  console.log("Is Pro Plan:", isProPlan);
-  console.log("Is Starter Plan:", isStarterPlan);
 
   // Logic for showing upload form:
   // 1. User must exist and have a valid userId
@@ -81,8 +65,21 @@ export default async function Dashboard() {
     !hasUserCancelled && 
     ((isBasicPlan && posts.length < 3) || isProPlan);
 
-  console.log("Can Show Upload Form:", canShowUploadForm);
-  console.log("========================");
+  // Debug info for display - REMOVE THIS IN PRODUCTION
+  const debugInfo = {
+    email,
+    userExists: !!user,
+    userId,
+    priceId,
+    planTypeId,
+    planTypeName,
+    hasUserCancelled,
+    postsCount: posts.length,
+    isBasicPlan,
+    isProPlan,
+    isStarterPlan,
+    canShowUploadForm
+  };
 
   return (
     <BgGradient>
@@ -99,6 +96,12 @@ export default async function Dashboard() {
           <p className="mt-2 text-lg leading-8 text-gray-600 max-w-2xl text-center">
             Upload your audio or video file and let our AI do the magic!
           </p>
+
+          {/* DEBUG INFO - REMOVE THIS IN PRODUCTION */}
+          <div className="bg-gray-100 p-4 rounded-lg text-left text-sm max-w-2xl">
+            <h3 className="font-bold mb-2">Debug Info:</h3>
+            <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
+          </div>
 
           {(isBasicPlan || isProPlan) && (
             <p className="mt-2 text-lg leading-8 text-gray-600 max-w-2xl text-center">
