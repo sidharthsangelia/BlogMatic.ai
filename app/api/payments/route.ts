@@ -1,8 +1,11 @@
-import { handleCheckOutSessionComplete, handleSubscriptionDeleted } from "@/lib/payment-helpers";
+import {
+  handleCheckOutSessionComplete,
+  handleSubscriptionDeleted,
+} from "@/lib/payment-helpers";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_API_KEY!)
+const stripe = new Stripe(process.env.STRIPE_API_KEY!);
 export async function POST(req: NextRequest) {
   const payload = await req.text();
   const signature = req.headers.get("stripe-signature");
@@ -25,15 +28,15 @@ export async function POST(req: NextRequest) {
         console.log({ session });
         // connect to db and handle session
 
-        await handleCheckOutSessionComplete({session, stripe})
+        await handleCheckOutSessionComplete({ session, stripe });
         break;
       }
       case "customer.subscription.deleted": {
         const subscriptionId = event.data.object.id;
- 
+
         // update user subscription status
-await handleSubscriptionDeleted({subscriptionId, stripe })
-        
+        await handleSubscriptionDeleted({ subscriptionId, stripe });
+
         break;
       }
       case "payment_method.attached": {
@@ -46,7 +49,10 @@ await handleSubscriptionDeleted({subscriptionId, stripe })
     }
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ status: "Failed", error: (err as Error).message }, { status: 400 });
+    return NextResponse.json(
+      { status: "Failed", error: (err as Error).message },
+      { status: 400 }
+    );
   }
 
   return NextResponse.json({ status: "success" }, { status: 200 });

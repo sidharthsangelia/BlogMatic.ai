@@ -2,7 +2,6 @@ import BgGradient from "@/components/common/bg-gradient";
 import { Badge } from "@/components/ui/badge";
 import UpgradeYourPlan from "@/components/UpgradeYourPlan";
 import UploadForm from "@/components/UploadForm";
-import { plans } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import {
   doesUserExist,
@@ -24,7 +23,7 @@ export default async function Dashboard() {
 
   const email = clerkUser?.emailAddresses?.[0].emailAddress ?? "";
 
-  //update the user id
+  // Update the user id
   let userId = null;
   let priceId = null;
 
@@ -32,8 +31,8 @@ export default async function Dashboard() {
   const user = await doesUserExist(email);
 
   if (user) {
-    //update the user_id in users table
-    userId = clerkUser?.id;
+    // Update the user_id in users table
+    userId = clerkUser.id;
     if (userId) {
       await updateUser(userId, email as string);
     }
@@ -41,21 +40,21 @@ export default async function Dashboard() {
     priceId = user[0].priceId;
   }
 
-  // Fix: Handle undefined return from getPlanType
+  // Handle undefined return from getPlanType
   const planType = getPlanType(priceId as string);
-  const { id: planTypeId = "starter", name: planTypeName = "Starter" } = planType ;
+  const { id: planTypeId = "starter", name: planTypeName = "Starter" } = planType || {};
 
   const isBasicPlan = planTypeId === "basic";
   const isProPlan = planTypeId === "pro";
 
-  // check number of posts per plan
-  const posts = await prisma.post.findMany({
+  // Check number of posts per plan
+  const posts = userId ? await prisma.post.findMany({
     where: {
-      userId: userId!,
+      userId: userId,
     },
-  });
+  }) : [];
 
-  const isValidBasicPlan = isBasicPlan && posts.length < 3;
+  const isValidBasicPlan = isBasicPlan && posts.length < 3 && userId !== null;
   
   return (
     <BgGradient>
@@ -85,9 +84,7 @@ export default async function Dashboard() {
           )}
 
           {isValidBasicPlan || isProPlan ? (
-            <BgGradient> 
-                <UploadForm />
-                </BgGradient>
+            <UploadForm />
           ) : (
             <UpgradeYourPlan />
           )}
