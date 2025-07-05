@@ -2,7 +2,6 @@ import BgGradient from "@/components/common/bg-gradient";
 import { Badge } from "@/components/ui/badge";
 import UpgradeYourPlan from "@/components/UpgradeYourPlan";
 import UploadForm from "@/components/UploadForm";
-import { plans } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import {
   doesUserExist,
@@ -44,27 +43,7 @@ export default async function Dashboard() {
   const planType = getPlanType(priceId as string);
   const { id: planTypeId = "starter", name: planTypeName = "Starter" } = planType || {};
 
-  // Debug info for display - REMOVE THIS IN PRODUCTION
-  const debugInfo = {
-    email,
-    userExists: !!user,
-    userId,
-    priceId,
-    planType: planType,
-    planTypeId,
-    planTypeName,
-    hasUserCancelled,
-   
-    isBasicPlan: planTypeId === "basic",
-    isProPlan: planTypeId === "pro",
-    isStarterPlan: planTypeId === "starter",
-    // Add plans array to debug
-    allPlans: plans,
-    // Check if priceId exists in plans
-    priceIdExists: plans.some(plan => plan.priceId === priceId)
-  };
-
-  const isBasicPlan = planTypeId === "basic";
+  const isRegularPlan = planTypeId === "regular";
   const isProPlan = planTypeId === "pro";
   const isStarterPlan = planTypeId === "starter";
 
@@ -75,16 +54,16 @@ export default async function Dashboard() {
     },
   }) : [];
 
-  // TEMPORARY FIX: Since your getPlanType() is not working correctly,
-  // let's check if user has a valid priceId (meaning they've paid)
-  const hasPaidPlan = priceId && priceId !== null && priceId !== "";
-  
   // Logic for showing upload form:
-  // Show upload form if user has any paid plan (temporary fix)
+  // 1. User must exist and have a valid userId
+  // 2. User must not have cancelled subscription
+  // 3. Either:
+  //    - Regular plan with less than 5 video conversions
+  //    - Pro plan (25 video conversions per month)
   const canShowUploadForm = 
     userId && 
     !hasUserCancelled && 
-    (hasPaidPlan || (isBasicPlan && posts.length < 3) || isProPlan);
+    ((isRegularPlan && posts.length < 5) || isProPlan);
 
   return (
     <BgGradient>
@@ -102,17 +81,11 @@ export default async function Dashboard() {
             Upload your audio or video file and let our AI do the magic!
           </p>
 
-          {/* DEBUG INFO - REMOVE THIS IN PRODUCTION */}
-          <div className="bg-gray-100 p-4 rounded-lg text-left text-sm max-w-2xl">
-            <h3 className="font-bold mb-2">Debug Info:</h3>
-            <pre>{JSON.stringify({...debugInfo, hasPaidPlan: priceId && priceId !== null && priceId !== "", canShowUploadForm: userId && !hasUserCancelled && (priceId && priceId !== null && priceId !== "")}, null, 2)}</pre>
-          </div>
-
-          {(isBasicPlan || isProPlan) && (
+          {(isRegularPlan || isProPlan) && (
             <p className="mt-2 text-lg leading-8 text-gray-600 max-w-2xl text-center">
               You get{" "}
               <span className="font-bold text-amber-600 bg-amber-100 px-2 py-1 rounded-md">
-                {isBasicPlan ? "3" : "Unlimited"} blog posts
+                {isRegularPlan ? "5" : "25"} video conversions
               </span>{" "}
               as part of the{" "}
               <span className="font-bold capitalize">{planTypeName}</span> Plan.
