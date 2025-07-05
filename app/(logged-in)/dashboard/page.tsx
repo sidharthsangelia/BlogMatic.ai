@@ -30,13 +30,12 @@ export default async function Dashboard() {
   const hasUserCancelled = await hasCancelledSubscription(email);
   const user = await doesUserExist(email);
 
-  if (user) {
+  if (user && user.length > 0) {
     // Update the user_id in users table
     userId = clerkUser.id;
     if (userId) {
       await updateUser(userId, email as string);
     }
-
     priceId = user[0].priceId;
   }
 
@@ -44,8 +43,20 @@ export default async function Dashboard() {
   const planType = getPlanType(priceId as string);
   const { id: planTypeId = "starter", name: planTypeName = "Starter" } = planType || {};
 
+  // Debug logs - remove these in production
+  console.log("=== DASHBOARD DEBUG ===");
+  console.log("Email:", email);
+  console.log("User exists:", !!user);
+  console.log("User ID:", userId);
+  console.log("Price ID:", priceId);
+  console.log("Plan Type:", planType);
+  console.log("Plan Type ID:", planTypeId);
+  console.log("Plan Type Name:", planTypeName);
+  console.log("Has User Cancelled:", hasUserCancelled);
+
   const isBasicPlan = planTypeId === "basic";
   const isProPlan = planTypeId === "pro";
+  const isStarterPlan = planTypeId === "starter";
 
   // Check number of posts per plan
   const posts = userId ? await prisma.post.findMany({
@@ -54,8 +65,25 @@ export default async function Dashboard() {
     },
   }) : [];
 
-  const isValidBasicPlan = isBasicPlan && posts.length < 3 && userId !== null;
-  
+  console.log("Posts count:", posts.length);
+  console.log("Is Basic Plan:", isBasicPlan);
+  console.log("Is Pro Plan:", isProPlan);
+  console.log("Is Starter Plan:", isStarterPlan);
+
+  // Logic for showing upload form:
+  // 1. User must exist and have a valid userId
+  // 2. User must not have cancelled subscription
+  // 3. Either:
+  //    - Basic plan with less than 3 posts
+  //    - Pro plan (unlimited posts)
+  const canShowUploadForm = 
+    userId && 
+    !hasUserCancelled && 
+    ((isBasicPlan && posts.length < 3) || isProPlan);
+
+  console.log("Can Show Upload Form:", canShowUploadForm);
+  console.log("========================");
+
   return (
     <BgGradient>
       <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
@@ -83,7 +111,7 @@ export default async function Dashboard() {
             </p>
           )}
 
-          {isValidBasicPlan || isProPlan ? (
+          {canShowUploadForm ? (
             <UploadForm />
           ) : (
             <UpgradeYourPlan />
