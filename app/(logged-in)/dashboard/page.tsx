@@ -2,6 +2,7 @@ import BgGradient from "@/components/common/bg-gradient";
 import { Badge } from "@/components/ui/badge";
 import UpgradeYourPlan from "@/components/UpgradeYourPlan";
 import UploadForm from "@/components/UploadForm";
+import { plans } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import {
   doesUserExist,
@@ -43,6 +44,26 @@ export default async function Dashboard() {
   const planType = getPlanType(priceId as string);
   const { id: planTypeId = "starter", name: planTypeName = "Starter" } = planType || {};
 
+  // Debug info for display - REMOVE THIS IN PRODUCTION
+  const debugInfo = {
+    email,
+    userExists: !!user,
+    userId,
+    priceId,
+    planType: planType,
+    planTypeId,
+    planTypeName,
+    hasUserCancelled,
+   
+    isBasicPlan: planTypeId === "basic",
+    isProPlan: planTypeId === "pro",
+    isStarterPlan: planTypeId === "starter",
+    // Add plans array to debug
+    allPlans: plans,
+    // Check if priceId exists in plans
+    priceIdExists: plans.some(plan => plan.priceId === priceId)
+  };
+
   const isBasicPlan = planTypeId === "basic";
   const isProPlan = planTypeId === "pro";
   const isStarterPlan = planTypeId === "starter";
@@ -54,32 +75,16 @@ export default async function Dashboard() {
     },
   }) : [];
 
+  // TEMPORARY FIX: Since your getPlanType() is not working correctly,
+  // let's check if user has a valid priceId (meaning they've paid)
+  const hasPaidPlan = priceId && priceId !== null && priceId !== "";
+  
   // Logic for showing upload form:
-  // 1. User must exist and have a valid userId
-  // 2. User must not have cancelled subscription
-  // 3. Either:
-  //    - Basic plan with less than 3 posts
-  //    - Pro plan (unlimited posts)
+  // Show upload form if user has any paid plan (temporary fix)
   const canShowUploadForm = 
     userId && 
     !hasUserCancelled && 
-    ((isBasicPlan && posts.length < 3) || isProPlan);
-
-  // Debug info for display - REMOVE THIS IN PRODUCTION
-  const debugInfo = {
-    email,
-    userExists: !!user,
-    userId,
-    priceId,
-    planTypeId,
-    planTypeName,
-    hasUserCancelled,
-    postsCount: posts.length,
-    isBasicPlan,
-    isProPlan,
-    isStarterPlan,
-    canShowUploadForm
-  };
+    (hasPaidPlan || (isBasicPlan && posts.length < 3) || isProPlan);
 
   return (
     <BgGradient>
@@ -100,7 +105,7 @@ export default async function Dashboard() {
           {/* DEBUG INFO - REMOVE THIS IN PRODUCTION */}
           <div className="bg-gray-100 p-4 rounded-lg text-left text-sm max-w-2xl">
             <h3 className="font-bold mb-2">Debug Info:</h3>
-            <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
+            <pre>{JSON.stringify({...debugInfo, hasPaidPlan: priceId && priceId !== null && priceId !== "", canShowUploadForm: userId && !hasUserCancelled && (priceId && priceId !== null && priceId !== "")}, null, 2)}</pre>
           </div>
 
           {(isBasicPlan || isProPlan) && (

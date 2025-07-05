@@ -11,13 +11,10 @@ export const plans = [
       "Email support",
       "Standard processing speed",
       "Download as markdown",
-      "Basic SEO optimization"
+      "Basic SEO optimization",
     ],
     paymentLink: "https://buy.stripe.com/test_00waEQclec2q73q2Orbsc00",
-    priceId:
-      process.env.NODE_ENV === "development"
-        ? "price_1RghXN4YIYKhBglKbP1QXuGN"  
-        : "",
+    priceId: "price_1RghXN4YIYKhBglKbP1QXuGN",
   },
   {
     id: "pro",
@@ -34,12 +31,9 @@ export const plans = [
       "Advanced SEO optimization",
       "Custom templates",
       "Bulk processing",
-      "API access"
+      "API access",
     ],
     paymentLink: "https://buy.stripe.com/test_28E14gcleaYm73q3Svbsc01",
-    priceId:
-      process.env.NODE_ENV === "development"
-        ? "price_1RghZs4YIYKhBglKK3lSJHjy"  
-        : "",
+    priceId: "price_1RghZs4YIYKhBglKK3lSJHjy",
   },
 ];
